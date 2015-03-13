@@ -1,0 +1,42 @@
+[
+  {
+    "Country":"Andorra",
+    "danceability":0.777766165,
+    "energy":0.087421267,
+    "speechiness":0.83084216,
+    "liveness":0.86377802,
+    "valence":0.10983014
+  },
+  {
+    "Country":"Italy",
+    "danceability":0.480121673,
+    "energy":0.225356785,
+    "speechiness":0.360936564,
+    "liveness":0.536883045,
+    "valence":0.460250083
+  }, 
+  {
+    "Country":"Montenegro",
+    "danceability":0.646156545,
+    "energy":0.221780323,
+    "speechiness":0.858888076,
+    "liveness":0.651046938,
+    "valence":0.016350155
+  },
+  {
+    "Country":"Czech Republic",
+    "danceability":0.77194359,
+    "energy":0.279245465,
+    "speechiness":0.750374671,
+    "liveness":0.770976455,
+    "valence":0.276017523
+  },
+  {
+    "Country":"Serbia",
+    "danceability":0.640103643,
+    "energy":0.522940056,
+    "speechiness":0.849225743,
+    "liveness":0.658846514,
+    "valence":0.220454242
+  }
+]
