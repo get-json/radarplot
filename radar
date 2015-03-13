@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<script type="text/javascript" src="d3/d3.v3.min.js"></script>
+<script type="text/javascript" src="d3/colorbrewer.v1.min.js"></script>
+<script type="text/javascript" src="d3/d3-tip/index.js"></script>
+<meta charset="utf-8">
+<head>
+<style>
+
+.polygon:hover {
+  fill-opacity:1;
+}</style></head>
+<body>
+<script>
+
+function yine(){
+
+var color = ["orangered","blue","green","violet","purple"];
+var width = 200,
+	height = 700;
+
+var legen = d3.select("body")
+	.append("svg")
+	.attr("width", width)
+	.attr("height", height)
+	.attr("fill","black")
+
+//Create the title for the legend
+var text = legen.append("text")
+	.attr("class", "title")
+	.attr("x", 10)
+	.attr("y", 20)
+	.style("font", "18px Verdana")
+	.attr("fill", "#404040")
+	.text("List of Countries");
+
+var legend = legen.append("g")
+	.attr("class", "legend")
+	.attr("height", 100)
+	.attr("width", 200)
+	.attr('transform', 'translate(90,20)') 
+	;
+
+
+d3.json("comparison.json", function(error, data) {
+countries = [];
+for(i=0; i<5; i++){
+ countries.push(data[i].Country);}
+console.log(countries);
+
+
+	//Create colour squares
+
+legen.selectAll('rect')
+	  .data(data)
+	  .enter()
+	  .append("rect")
+	  .attr('transform', 'translate(20,40)') 
+	  .attr("x", 10)
+	  .attr("y", function(d, i){ return i * 40;})
+	  .attr("width", 20)
+	  .attr("height", 20)
+	  .style("fill", function(d, i){ return color[i];})
+	  ;
+	//Create text next to squares
+	console.log(countries.length);
+	legen.selectAll("text1")
+	  .data(data).enter()
+	  .append("text")
+	  .attr('transform', 'translate(20,40)')
+	  .attr("x", 40)
+	  .attr("y", function(d, i){ return i * 40 + 15;})
+	  .style("font", "14px  Verdana")
+	  .attr("fill", "black")
+	  .text(function(d) { return d.Country;});	
+
+
+
+
+
+})
+}
+function xine(){
+var color = d3.scale.category20();
+var width = 800,
+	height = 700,
+	mid = 350,
+	rad = 300,
+	rad1=330,
+	inrad = 2*Math.PI/5,
+	nty = Math.PI/2;
+
+scale = d3.scale.linear()
+    .range([0,rad]);		    
+
+
+
+var vis = d3.select("body").append("svg")
+		    .attr("width", width)
+		    .attr("height", height);
+
+    
+radii = [];
+for(i = 1; i < 11; i++){radii.push(i/10)}
+ 
+ //drawing concentric circles
+concirc = vis.append('g')
+.attr('transform', "translate(" + mid + "," + mid + ")");
+concirc.selectAll('circle')
+.data(radii)
+.enter().append('circle')
+.attr('r', function(d) {return d*rad;})
+.attr("stroke-width", .5)
+.attr("opacity",".5")
+.attr("stroke", "grey")
+.attr("fill","none");
+//drawing concentric circles
+console.log(radii);
+
+
+//adding axis labels
+axislbl =  vis.append('g')
+				.selectAll('text')
+				.data(radii)
+				.enter().append('text')
+				.attr("x",function(d){return mid + (scale(d) * Math.sin(Math.PI)) ;})
+				.attr("y",function(d){return mid + (scale(d) * Math.cos(Math.PI)) ;})
+				.text(function(d) { return d; })
+				.style("font", "12px Verdana");
+
+//adding inside lines
+var a = [0,1,2,3,4];
+vis.selectAll("lines").data(a).enter()
+	.append("line")
+	.attr("x1", mid)
+	.attr("y1", mid)
+	.attr("x2", function(a){return mid + (rad1 * Math.cos(a*inrad-nty)) ; } )
+	.attr("y2", function(a){return mid + (rad1 * Math.sin(a*inrad-nty)) ; } )
+	.attr("stroke-width", 1)
+	.attr("stroke", "grey")
+	.attr("opacity", 0.6);
+
+var countries = [];
+d3.json("comparison.json", function(error, data) {
+
+//drawing the core lines
+var attributes = d3.keys(data[0]).filter(function(Key){return Key != "Country";});
+console.log(attributes);
+
+
+for(i=0; i<5; i++){
+ countries.push(data[i].Country);}
+console.log(countries);
+
+var atrval = d3.values(data[0]).filter(function(Value) { return Value;});
+var atrval2 = d3.values(data[2]).filter(function(Value) { return Value;});
+var atrval3 = d3.values(data[3]).filter(function(Value) { return Value;});
+var atrval4 = d3.values(data[4]).filter(function(Value) { return Value;});
+var atrval1 = d3.values(data[1]).filter(function(Value) { return Value;});
+
+
+function somethingcool(foo,col){
+	var vertices  = [];
+
+for(i = 0; i <foo.length; i++)
+{
+
+	vertices.push({"x":mid + (scale(foo[i]) * Math.cos((i)*inrad-nty)) ,"y":mid + (scale(foo[i]) * Math.sin((i)*inrad-nty))})
+
+}
+//console.log(vertices)
+
+vis.selectAll("polygon"+col)
+    .data([vertices])
+  .enter().append("polygon")
+    .attr("points",function(d) { 
+        return d.map(function(d) { return [d.x,d.y].join(","); }).join(" ");})
+
+    .attr("fill",col)
+    .attr("opacity",0.2).on('mouseover', function(d){d3.select(this).attr("opacity", 0.8);})
+      .on('mouseout', function(d){d3.select(this).attr("opacity", 0.4);});
+//console.log("infunc");
+//console.log(vertices);
+
+vis.selectAll("node")
+      .data(vertices)
+      .enter().append("circle").attr("class","node")
+      .attr("cx",function(d){return d.x;})
+      .attr("cy",function(d){return d.y;})
+      .attr("class", "node")
+      .attr("r", 4)      
+      .style("fill", col)
+      .attr("opacity", 0.8)
+      .on('mouseover', function(d){d3.select(this).attr("opacity", 1);})
+      .on('mouseout', function(d){d3.select(this).attr("opacity", 0.8);})
+	  .append("title")
+   	  .text(function(d,i) {return foo[i].toFixed(2);});
+}
+somethingcool(atrval.slice(1),"orangered");
+somethingcool(atrval1.slice(1),"blue");
+somethingcool(atrval2.slice(1),"green");
+somethingcool(atrval3.slice(1),"violet");
+somethingcool(atrval4.slice(1),"purple");
+
+var b = [0.2,0.4,0.6,0.8];
+//var c = scale(b);
+//console.log(c);
+
+vis.selectAll("lines").data(attributes).enter()
+				.append("text").attr("class", "legend")
+				.text(function(d){return d;})
+				.attr("x", function(a,i){return mid + (rad1 * Math.cos(i*inrad-nty)) ; } )
+				.attr("y", function(a,i){return mid + (rad1 * Math.sin(i*inrad-nty)) ; } )
+				.attr("dx", 1)
+     .attr("dy", ".35em")
+     .attr("text-anchor", "middle")
+     .style("font", "14px Verdana")
+     .style("font-weight", "bold");
+
+
+
+})
+}
+		
+
+</script>
+<table>
+	<tr>
+		<td><div id= "div_g1"><script>xine()</script></div></td>
+		<td><div id= "div_g2"><script>yine()</script></div></td>
+	</tr>
+</table>
+	</body>
+
